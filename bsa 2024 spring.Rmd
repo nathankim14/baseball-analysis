@@ -1,0 +1,105 @@
+---
+title: "DJ 2024 Spring Data"
+author: "Nathan Kim"
+date: "2024-05-04"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r}
+library(readr)
+library(ggplot2)
+library(googlesheets4)
+```
+
+## DATA FILES
+```{r}
+spring24 <- gsheet2tbl("https://docs.google.com/spreadsheets/d/1uoIvMx4FqvDA3d35Jap6JPnfej3cOhPbAQqEmJsJ3eA/edit?usp=sharing")
+spring24_1 <- gsheet2tbl("https://docs.google.com/spreadsheets/d/1A98ajkBU8l69J6wFN37raALQqIUAsegX6Syak8nCU0w/edit#gid=0")
+spring24_2 <- gsheet2tbl("https://docs.google.com/spreadsheets/d/1ikYVz-T39-bimuyQ0aZqGQHIJer_DlH3DFGE9-IOszI/edit#gid=0")
+```
+
+## Linear Correlation Coefficients
+```{r}
+cor(spring24$`CS Percentage Difference`,spring24$`Winning Percentage Difference`)
+cor(spring24$`SB Difference by team`, spring24$`Winning Percentage Difference`)
+cor(spring24$`SB Difference in Success Rate by team`, spring24$`Winning Percentage Difference`)
+
+
+cor(spring24_1$`SB Difference in Success Rate by team above average`, spring24_1$`Winning Percentage Difference above average`)
+cor(spring24_1$`SB Difference by team`, spring24_1$`Winning Percentage Difference`,use="complete.obs")
+```
+
+#Exponential Correlation Coefficients
+```{r}
+model <- lm(log(spring24$`SB Difference by team`)~ spring24$`Winning Percentage Difference`)
+model1 <- lm(log(spring24$`CS Percentage Difference`)~ spring24$`Winning Percentage Difference`)
+model2 <- lm(log(spring24$`SB Difference in Success Rate by team`)~ spring24$`Winning Percentage Difference`)
+
+
+#view the output of the model
+summary(model)
+summary(model1)
+summary(model2)
+```
+
+## Quadratic Correlation Coefficients
+```{r}
+data$hours2 <- spring24$`SB Difference by team`^2
+
+#fit quadratic regression model
+quadraticModel <- lm(`Winning Percentage Difference`~ `CS Percentage Difference` + `CS Percentage Difference`^2, data=spring24)
+
+quadraticModel1 <- lm(`Winning Percentage Difference`~ `SB Difference by team` + `SB Difference by team`^2, data=spring24)
+
+quadraticModel2 <- lm(`Winning Percentage Difference`~ `SB Difference in Success Rate by team` + `SB Difference in Success Rate by team`^2, data=spring24)
+#view model summary
+summary(quadraticModel)
+summary(quadraticModel1)
+summary(quadraticModel2)
+```
+
+
+## Plots
+```{r}
+ggplot(spring24,aes(x=`CS Percentage Difference`,y=`Winning Percentage Difference`))+geom_point()
+ggplot(spring24,aes(x=`SB Difference by team`,y=`Winning Percentage Difference`))+geom_point()
+ggplot(spring24,aes(x=`SB Difference in Success Rate by team`,y=`Winning Percentage Difference`))+geom_point()
+
+
+ggplot(spring24, aes(x=spring24$`CS Percentage Difference`, y=spring24$`Winning Percentage Difference`, color='line of best fit')) +
+    geom_point(size=2, color = 'blue') +
+    geom_smooth(method="lm", se = FALSE, fullrange = TRUE) +xlab("CS Percentage Difference") +ylab("Winning Percentage Difference") + ggtitle("Difference in Caught Steal Percentage by Team vs \n Difference in Winning Percentage")
+
+ggplot(spring24, aes(x=spring24$`SB Difference by team`, y=spring24$`Winning Percentage Difference`, color='line of best fit')) +
+    geom_point(size=2, color = 'blue') +
+    geom_smooth(method="lm", se = FALSE, fullrange = TRUE) +xlab("SB Difference by team") +ylab("Winning Percentage Difference") + ggtitle("Difference in Steal Base by Team vs \n Difference in Winning Percentage")
+
+ggplot(spring24, aes(x=spring24$`SB Difference in Success Rate by team`, y=spring24$`Winning Percentage Difference`, color='line of best fit')) +
+    geom_point(size=2, color = 'blue') +
+    geom_smooth(method="lm", se = FALSE, fullrange = TRUE) +xlab("SB Difference in success Rate by team") +ylab("Winning Percentage Difference") + ggtitle(" Difference in Steal Base Success Rate vs \n Difference in Winning Percentage")
+
+ggplot(spring24_1, aes(x=spring24_1$`SB Difference in Success Rate by team above average`, y=spring24_1$`Winning Percentage Difference above average`, color='line of best fit')) +
+    geom_point(size=2, col = 'blue') +
+    geom_smooth(method="lm", se = FALSE, fullrange = TRUE) +xlab("SB Difference in Success Rate by team above average") +ylab("Winning Percentage Difference above average") + ggtitle("Difference in Steal Base Success Rate vs \n Difference in Winning Percentage \n (Only Teams with Above Average \n Steal Base Success Rate)")
+
+ggplot(spring24_1, aes(x=spring24_1$`SB Difference by team`, y=spring24_1$`Winning Percentage Difference`, color='line of best fit')) +
+    geom_point(size=2, color = 'blue') +
+    geom_smooth(method="lm",se = FALSE, fullrange = TRUE) +xlab("SB Difference by team") +ylab("Winning Percentage Difference") + ggtitle("Difference in Steal Base by Team vs \n Difference in Winning Percentage")
+```
+
+##WHY SB IS NOT EFFECTIVE
+```{r}
+cor(spring24_2$`SB`,spring24_2$`OPS`)
+model3 <- lm(log(spring24_2$`SB`)~ spring24_2$`HR`)
+model4 <- lm(log(spring24_2$`SB`)~ spring24_2$`OPS`)
+summary(model3)
+summary(model4)
+quadraticModel3 <- lm(`SB`~ `HR` + `HR`^2, data=spring24_2)
+quadraticModel4 <- lm(`SB`~ `OPS` + `OPS`^2, data=spring24_2)
+summary(quadraticModel3)
+summary(quadraticModel4)
+
+
+```

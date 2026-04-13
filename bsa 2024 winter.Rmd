@@ -1,0 +1,43 @@
+---
+title: "markdown absolute"
+author: "Nathan Kim"
+date: "2024-03-04"
+output: pdf_document
+---
+
+```{r}
+library(readr)
+library(ggplot2)
+library(googlesheets4)
+aaa <- read_sheet("https://docs.google.com/spreadsheets/d/1nhhzAvbhbsDv9FQd3XFr9ippG9tT_DHkm5yvNXX8HVs/edit?usp=sharing")
+
+cor(aaa$`vmovement (kbo)`,aaa$`vmovement (mlb)`)
+ggplot(aaa,aes(x=`hmovement (kbo) ab`,y=`hmovement (mlb)`))+geom_point()
+cor(aaa$`hmovement (kbo) ab`,aaa$`hmovement (mlb)`)
+
+ggplot(aaa, aes(x=aaa$`spin rate (kbo)`, y=aaa$`spin rate (mlb)`, color='1')) +
+    geom_point(size=2) +
+    geom_smooth(method="lm") +xlab("vertical movement (kbo)") +ylab("vertical movement (mlb)")
+
+ggplot(aaa, aes(x=aaa$`exit velocity (kbo)`, y=aaa$`exit velocity (mlb)`, color='1')) +
+    geom_point(size=2) +
+    geom_smooth(method="lm") +xlab("vertical movement (kbo)") +ylab("vertical movement (mlb)")
+
+ggplot(aaa, aes(x=aaa$`hardhit rate (kbo)`, y=aaa$`hardhit rate (kbo)`, color='1')) +
+    geom_point(size=2) +
+    geom_smooth(method="lm") +xlab("vertical movement (kbo)") +ylab("vertical movement (mlb)")
+
+ggplot(aaa, aes(x=aaa$`vmovement (kbo)`, y=aaa$`vmovement (mlb)`, color='1')) +
+    geom_point(size=2) +
+    geom_smooth(method="lm") +xlab("vertical movement (kbo)") +ylab("vertical movement (mlb)")
+summary(lm(aaa$`vmovement (mlb)` ~ aaa$`vmovement (kbo)`))$coefficients           
+
+ggplot(aaa, aes(x=aaa$`hmovement (kbo) ab`, y=aaa$`hmovement (mlb)`, color='1')) +
+    geom_point(size=2) +
+    geom_smooth(method="lm") +xlab("horiztonal movement (kbo)") +ylab("horiztonal movement (mlb)")
+summary(lm(aaa$`hmovement (mlb)` ~ aaa$`hmovement (kbo) ab`))$coefficients  
+#, se=FALSE, col='purple', linetype='dashed') +
+  #  theme_bw()
+
+```
+
